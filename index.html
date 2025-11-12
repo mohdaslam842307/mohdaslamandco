@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MOHD ASLAM & CO.</title>
+  <meta name="description" content="MOHD ASLAM & CO. — Accounting, Taxation, Consultancy" />
+  <style>
+    :root{
+      --bg-1: #050814;
+      --bg-2: #081029;
+      --card: rgba(255,255,255,0.03);
+      --muted: #9fb0c8;
+      --accent-blue: #0ea5ff;
+      --accent-neon: #67f26a;
+      --glass: rgba(255,255,255,0.04);
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));color:#e6eef8;-webkit-font-smoothing:antialiased;}
+    .container{max-width:1100px;margin:40px auto;padding:28px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;position:relative;z-index:2}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;padding:6px;border-radius:12px}
+    /* soft neon glow behind logo */
+    .logo-glow{
+      position:absolute;inset: -12px;z-index:0;border-radius:14px;
+      background: radial-gradient(closest-side, rgba(103,242,106,0.16), rgba(14,165,255,0.06) 40%, transparent 60%);
+      filter: blur(18px);
+      pointer-events:none;
+    }
+    .brand img{height:56px;width:auto;z-index:3;position:relative;border-radius:8px;background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:6px}
+    .brand h1{font-size:1.15rem;margin:0;letter-spacing:0.6px}
+    .brand .tag{color:var(--muted);font-size:0.9rem;margin-top:2px}
+    nav a{color:var(--muted);text-decoration:none;margin-left:18px}
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;margin-top:36px;position:relative;z-index:1}
+    /* background glow accent */
+    .hero::before{
+      content:'';position:absolute;right:-120px;top:-40px;width:560px;height:560px;border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, rgba(14,165,255,0.09), rgba(103,242,106,0.06) 25%, transparent 50%);
+      filter:blur(60px);z-index:0;pointer-events:none;
+    }
+    .hero-card{background:var(--card);padding:34px;border-radius:18px;box-shadow:0 10px 40px rgba(2,6,23,0.6);position:relative;z-index:2}
+    .cta{display:inline-block;margin-top:18px;padding:12px 18px;border-radius:12px;background:linear-gradient(90deg,var(--accent-blue),#6d28d9);color:#042027;text-decoration:none;font-weight:700}
+    .logo-preview{display:flex;flex-direction:column;gap:12px;align-items:center;position:relative;z-index:2}
+    .logo-preview img{max-width:100%;border-radius:12px;box-shadow:0 16px 60px rgba(2,6,23,0.6)}
+    .section{margin-top:34px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .card{background:var(--glass);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    footer{margin-top:36px;padding:18px;text-align:center;color:var(--muted);font-size:0.9rem}
+    /* subtle animated lines pattern */
+    .pattern-lines{
+      position:absolute;inset:0;opacity:0.03;pointer-events:none;background-image:linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);background-size:60px 60px;z-index:0;
+      mix-blend-mode:overlay;
+    }
+    @media (max-width:940px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
+    /* fallback empty logo style */
+    .logo-fallback{display:inline-block;padding:10px 14px;border-radius:8px;background:linear-gradient(90deg,var(--accent-blue),var(--accent-neon));color:#021017;font-weight:700}
+  </style>
+  <script>
+    // Robust auto-detect and set logo for both header and preview.
+    document.addEventListener("DOMContentLoaded", function() {
+      const headerImg = document.getElementById("logo-img");
+      const previewImg = document.getElementById("logo-img-preview");
+      const formats = ["png","jpg","jpeg","webp","svg"];
+      let found = false;
+      // Try each extension sequentially and use the first that loads successfully.
+      (async function findLogo(){
+        for(const ext of formats){
+          const path = `logo-horizontal.` + ext;
+          try{
+            // use fetch to check existence (works in file:// might not; so also try Image onload fallback)
+            if(window.location.protocol.startsWith('http')){
+              const res = await fetch(path, {method:'HEAD'});
+              if(res.ok){
+                headerImg.src = path;
+                previewImg.src = path;
+                found = true;
+                break;
+              }
+            } else {
+              // local file protocol: create Image to test onload
+              await new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => { resolve(true); };
+                img.onerror = () => { resolve(false); };
+                img.src = path;
+              }).then(ok=>{
+                if(ok && !found){
+                  headerImg.src = path;
+                  previewImg.src = path;
+                  found = true;
+                }
+              });
+              if(found) break;
+            }
+          } catch(e){
+            // ignore errors and continue trying other extensions
+          }
+        }
+        if(!found){
+          // leave empty src and show fallback title
+          headerImg.style.display = 'none';
+          previewImg.style.display = 'none';
+          document.getElementById('logo-fallback-header').style.display = 'inline-block';
+          document.getElementById('logo-fallback-preview').style.display = 'inline-block';
+        } else {
+          // show glow element if logo is found
+          document.querySelectorAll('.logo-glow').forEach(el=>el.style.display='block');
+        }
+      })();
+    });
+  </script>
+</head>
+<body>
+  <div class="pattern-lines"></div>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <span class="logo-wrap">
+          <div class="logo-glow" style="display:none"></div>
+          <img id="logo-img" alt="MOHD ASLAM & CO. Logo" />
+          <span id="logo-fallback-header" class="logo-fallback" style="display:none">MA&CO</span>
+        </span>
+        <div>
+          <h1>MOHD ASLAM & CO.</h1>
+          <div class="tag">Accounting • Taxation • Consultancy</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#services">Services</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <section id="home" class="hero">
+      <div class="hero-card">
+        <h2 style="margin-top:0;font-size:2rem">Professional Accounting & Tax Solutions</h2>
+        <p style="color:var(--muted)">MOHD ASLAM & CO. provides complete financial, accounting and taxation services to businesses and individuals. Reliable, transparent & tailored solutions.</p>
+        <a class="cta" href="https://wa.me/918739011878" target="_blank" rel="noopener noreferrer">💬 Chat on WhatsApp</a>
+      </div>
+
+      <aside class="logo-preview">
+        <img id="logo-img-preview" alt="MOHD ASLAM & CO. Horizontal Logo" style="height:120px;" />
+        <span id="logo-fallback-preview" class="logo-fallback" style="display:none">MOHD ASLAM & CO.</span>
+        <div style="color:var(--muted);font-size:0.9rem;text-align:center;max-width:420px">Our professional identity — modern, trusted and dedicated.</div>
+      </aside>
+    </section>
+
+    <section id="services" class="section">
+      <h3>Our Services</h3>
+      <div class="grid">
+        <div class="card">
+          <h4>Accounting</h4>
+          <p style="color:var(--muted)">Complete bookkeeping and financial statement preparation for individuals and businesses.</p>
+        </div>
+        <div class="card">
+          <h4>Taxation</h4>
+          <p style="color:var(--muted)">Expert GST, Income Tax filing, and compliance services ensuring timely and accurate submissions.</p>
+        </div>
+        <div class="card">
+          <h4>Consultancy</h4>
+          <p style="color:var(--muted)">Advisory services for business growth, audit support, and financial planning.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <h3>About Us</h3>
+      <p style="color:var(--muted)">With over 8+ years of professional experience, MOHD ASLAM & CO. is committed to accuracy, transparency, and long-term client relationships.</p>
+    </section>
+
+    <section id="contact" class="section">
+      <h3>Contact</h3>
+      <div class="card" style="display:flex;gap:16px;flex-direction:column;max-width:640px;">
+        <label style="color:var(--muted)">Name
+          <input type="text" placeholder="Name" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:inherit">
+        </label>
+        <label style="color:var(--muted)">Email
+          <input type="email" placeholder="you@example.com" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:inherit">
+        </label>
+        <label style="color:var(--muted)">Message
+          <textarea rows="4" placeholder="Message" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:inherit"></textarea>
+        </label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button style="padding:10px 14px;border-radius:10px;border:none;font-weight:700;background:linear-gradient(90deg,var(--accent-blue),var(--accent-neon));color:#042027">Send</button>
+          <a href="https://wa.me/918739011878" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent-blue),var(--accent-neon));color:#042027;font-weight:700">
+            💬 Chat on WhatsApp
+          </a>
+          <div style="color:var(--muted);font-size:0.9rem">Email: <strong>contact@mohdaslamandco.com</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      © 2025 MOHD ASLAM & CO. • All Rights Reserved
+    </footer>
+  </div>
+</body>
+</html>
